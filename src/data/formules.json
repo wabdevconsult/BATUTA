@@ -1,0 +1,49 @@
+[
+  {
+    "id": "consommation-irve",
+    "nom": "Simulateur de consommation IRVE",
+    "champs": [
+      {"label": "Puissance (kW)", "type": "slider", "min": 1, "max": 22, "step": 1, "defaultValue": 7},
+      {"label": "Durée (heures)", "type": "number", "defaultValue": 1}
+    ],
+    "formule": "(Puissance * Durée).toFixed(2) + ' kWh'"
+  },
+  {
+    "id": "devis-photovoltaique",
+    "nom": "Simulateur de devis photovoltaïque",
+    "champs": [
+      {"label": "Surface disponible (m²)", "type": "slider", "min": 10, "max": 100, "step": 5, "defaultValue": 30},
+      {"label": "Puissance par m² (kWc)", "type": "slider", "min": 0.1, "max": 0.2, "step": 0.01, "defaultValue": 0.15},
+      {"label": "Prix au kWc (€)", "type": "number", "defaultValue": 1800}
+    ],
+    "formule": "((Surface * Puissance) * Prix).toFixed(2) + ' €'"
+  },
+  {
+    "id": "calcul-tva",
+    "nom": "Calculateur de TVA",
+    "champs": [
+      {"label": "Montant HT (€)", "type": "number", "defaultValue": 1000},
+      {"label": "Taux de TVA (%)", "type": "select", "options": ["5.5", "10", "20"], "defaultValue": "20"}
+    ],
+    "formule": "(Montant * (1 + (Taux / 100))).toFixed(2) + ' €'"
+  },
+  {
+    "id": "calcul-marge",
+    "nom": "Calculateur de marge",
+    "champs": [
+      {"label": "Prix d'achat (€)", "type": "number", "defaultValue": 100},
+      {"label": "Marge souhaitée (%)", "type": "slider", "min": 0, "max": 100, "step": 1, "defaultValue": 30}
+    ],
+    "formule": "(Prix * (1 + (Marge / 100))).toFixed(2) + ' €'"
+  },
+  {
+    "id": "estimation-chauffage",
+    "nom": "Estimation consommation chauffage",
+    "champs": [
+      {"label": "Surface habitable (m²)", "type": "number", "defaultValue": 100},
+      {"label": "Coefficient isolation", "type": "select", "options": ["Mauvaise (2)", "Moyenne (1.5)", "Bonne (1)", "Très bonne (0.7)"], "defaultValue": "Moyenne (1.5)"},
+      {"label": "Prix kWh (€)", "type": "number", "defaultValue": 0.15}
+    ],
+    "formule": "let coef = 1.5; if (Coefficient === 'Mauvaise (2)') coef = 2; else if (Coefficient === 'Moyenne (1.5)') coef = 1.5; else if (Coefficient === 'Bonne (1)') coef = 1; else coef = 0.7; (Surface * coef * 100 * Prix).toFixed(2) + ' €/an'"
+  }
+]
