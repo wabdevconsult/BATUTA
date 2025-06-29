@@ -11,8 +11,8 @@ interface PersonalizationState {
   resetPersonalization: () => void;
 }
 
-// Default personalization template
-const defaultPersonalization: Personalization = {
+// Default personalization template - exported for use in components
+export const defaultPersonalization: Personalization = {
   userId: '',
   siteName: "Mon Entreprise",
   logo: "https://via.placeholder.com/150x50",
@@ -140,7 +140,9 @@ export const usePersonalizationStore = create<PersonalizationState>((set) => ({
     try {
       set({ loading: true, error: null });
       const data = await getMyPersonalization();
-      set({ personalization: data, loading: false });
+      // Merge fetched data with default personalization to ensure all properties exist
+      const mergedData = { ...defaultPersonalization, ...data };
+      set({ personalization: mergedData, loading: false });
     } catch (error: any) {
       console.error('Failed to fetch personalization:', error);
       // If no personalization exists yet, use the default template
@@ -156,7 +158,9 @@ export const usePersonalizationStore = create<PersonalizationState>((set) => ({
     try {
       set({ loading: true, error: null });
       const updatedData = await savePersonalization(data);
-      set({ personalization: updatedData, loading: false });
+      // Merge updated data with default personalization to ensure all properties exist
+      const mergedData = { ...defaultPersonalization, ...updatedData };
+      set({ personalization: mergedData, loading: false });
     } catch (error: any) {
       console.error('Failed to update personalization:', error);
       set({ 

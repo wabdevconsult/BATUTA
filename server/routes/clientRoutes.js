@@ -20,7 +20,12 @@ const clientValidation = [
   check('name', 'Name is required').not().isEmpty(),
   check('email').optional().isEmail(),
   check('phone').optional(),
-  check('address').optional()
+  check('address').optional(),
+  check('subscribed').optional().isBoolean(),
+  check('subscriptionType').optional().isIn(['basic', 'premium', 'enterprise', null]),
+  check('subscriptionStartDate').optional().isISO8601().toDate(),
+  check('subscriptionEndDate').optional().isISO8601().toDate(),
+  check('notes').optional()
 ];
 
 // Get all clients (with role-based filtering in controller)

@@ -6,7 +6,6 @@ import Home from './pages/Home';
 import MetiersLanding from './pages/MetiersLanding';
 import Fonctionnalites from './pages/Fonctionnalites';
 import Contact from './pages/Contact';
-import Login from './pages/Login';
 import PageAccueilPersonnalisee from './pages/PageAccueilPersonnalisee';
 
 // Auth pages
@@ -22,6 +21,7 @@ import AdminDashboard from './pages/dashboard/AdminDashboard';
 import TechnicienDashboard from './pages/dashboard/TechnicienDashboard';
 import ClientDashboard from './pages/dashboard/ClientDashboard';
 import FournisseurDashboard from './pages/dashboard/FournisseurDashboard';
+import MessagesPage from './pages/dashboard/MessagesPage';
 
 // Auth guard
 import AuthGuard from './components/auth/AuthGuard';
@@ -89,6 +89,17 @@ import UsersPage from './pages/dashboard/UsersPage';
 import ProduitsPage from './pages/dashboard/ProduitsPage';
 import CommandesPage from './pages/dashboard/CommandesPage';
 import LivraisonsPage from './pages/dashboard/LivraisonsPage';
+import QuoteRequestsPage from './pages/dashboard/QuoteRequestsPage';
+import InterventionsPage from './pages/dashboard/InterventionsPage';
+import InterventionDetailPage from './pages/dashboard/InterventionDetailPage';
+import InterventionMapPage from './pages/dashboard/InterventionMapPage';
+import InterventionFormPage from './pages/dashboard/InterventionFormPage';
+import EquipmentsPage from './pages/dashboard/EquipmentsPage';
+import EquipmentDetailPage from './pages/dashboard/EquipmentDetailPage';
+import EquipmentFormPage from './pages/dashboard/EquipmentFormPage';
+import InstallationsPage from './pages/dashboard/InstallationsPage';
+import InstallationDetailPage from './pages/dashboard/InstallationDetailPage';
+import InstallationFormPage from './pages/dashboard/InstallationFormPage';
 
 import { useAuthStore } from './store/authStore';
 
@@ -136,15 +147,6 @@ function App() {
               <Footer />
             </>
           } />
-          <Route path="/login" element={
-            <>
-              <Header />
-              <main className="flex-1">
-                <Login />
-              </main>
-              <Footer />
-            </>
-          } />
           <Route path="/personnaliser" element={
             <>
               <Header />
@@ -157,9 +159,9 @@ function App() {
           
           {/* Auth Routes without Header and Footer */}
           <Route path="/auth/login" element={<AuthLogin />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/auth/register" element={<Register />} />
+          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+          <Route path="/auth/reset-password" element={<ResetPassword />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
           
           {/* Dashboard Routes with AuthGuard */}
@@ -192,6 +194,14 @@ function App() {
             <AuthGuard>
               <DashboardLayout>
                 <UserPersonalization />
+              </DashboardLayout>
+            </AuthGuard>
+          } />
+          
+          <Route path="/dashboard/messages" element={
+            <AuthGuard>
+              <DashboardLayout>
+                <MessagesPage />
               </DashboardLayout>
             </AuthGuard>
           } />
@@ -256,6 +266,118 @@ function App() {
             <AuthGuard allowedRoles={['fournisseur']}>
               <DashboardLayout>
                 <LivraisonsPage />
+              </DashboardLayout>
+            </AuthGuard>
+          } />
+          
+          <Route path="/dashboard/quote-requests" element={
+            <AuthGuard allowedRoles={['admin', 'technicien']}>
+              <DashboardLayout>
+                <QuoteRequestsPage />
+              </DashboardLayout>
+            </AuthGuard>
+          } />
+          
+          <Route path="/dashboard/interventions" element={
+            <AuthGuard>
+              <DashboardLayout>
+                <InterventionsPage />
+              </DashboardLayout>
+            </AuthGuard>
+          } />
+          
+          <Route path="/dashboard/interventions/new" element={
+            <AuthGuard allowedRoles={['admin', 'technicien']}>
+              <DashboardLayout>
+                <InterventionFormPage />
+              </DashboardLayout>
+            </AuthGuard>
+          } />
+          
+          <Route path="/dashboard/interventions/:id" element={
+            <AuthGuard>
+              <DashboardLayout>
+                <InterventionDetailPage />
+              </DashboardLayout>
+            </AuthGuard>
+          } />
+          
+          <Route path="/dashboard/interventions/:id/edit" element={
+            <AuthGuard allowedRoles={['admin', 'technicien']}>
+              <DashboardLayout>
+                <InterventionFormPage />
+              </DashboardLayout>
+            </AuthGuard>
+          } />
+          
+          <Route path="/dashboard/interventions/:id/map" element={
+            <AuthGuard>
+              <DashboardLayout>
+                <InterventionMapPage />
+              </DashboardLayout>
+            </AuthGuard>
+          } />
+          
+          <Route path="/dashboard/equipments" element={
+            <AuthGuard>
+              <DashboardLayout>
+                <EquipmentsPage />
+              </DashboardLayout>
+            </AuthGuard>
+          } />
+          
+          <Route path="/dashboard/equipments/new" element={
+            <AuthGuard allowedRoles={['admin', 'technicien']}>
+              <DashboardLayout>
+                <EquipmentFormPage />
+              </DashboardLayout>
+            </AuthGuard>
+          } />
+          
+          <Route path="/dashboard/equipments/:id" element={
+            <AuthGuard>
+              <DashboardLayout>
+                <EquipmentDetailPage />
+              </DashboardLayout>
+            </AuthGuard>
+          } />
+          
+          <Route path="/dashboard/equipments/:id/edit" element={
+            <AuthGuard allowedRoles={['admin', 'technicien']}>
+              <DashboardLayout>
+                <EquipmentFormPage />
+              </DashboardLayout>
+            </AuthGuard>
+          } />
+          
+          <Route path="/dashboard/installations" element={
+            <AuthGuard allowedRoles={['admin', 'technicien']}>
+              <DashboardLayout>
+                <InstallationsPage />
+              </DashboardLayout>
+            </AuthGuard>
+          } />
+          
+          <Route path="/dashboard/installations/new" element={
+            <AuthGuard allowedRoles={['admin', 'technicien']}>
+              <DashboardLayout>
+                <InstallationFormPage />
+              </DashboardLayout>
+            </AuthGuard>
+          } />
+          
+          <Route path="/dashboard/installations/:id" element={
+            <AuthGuard allowedRoles={['admin', 'technicien']}>
+              <DashboardLayout>
+                <InstallationDetailPage />
+              </DashboardLayout>
+            </AuthGuard>
+          } />
+          
+          <Route path="/dashboard/installations/:id/edit" element={
+            <AuthGuard allowedRoles={['admin', 'technicien']}>
+              <DashboardLayout>
+                <InstallationFormPage />
               </DashboardLayout>
             </AuthGuard>
           } />

@@ -13,6 +13,7 @@ import {
   Shield,
   Send
 } from 'lucide-react';
+import axios from 'axios';
 
 const DemanderDevis = () => {
   const [formData, setFormData] = useState({
@@ -21,17 +22,47 @@ const DemanderDevis = () => {
     telephone: '',
     entreprise: '',
     metier: '',
-    besoins: [],
-    message: ''
+    besoins: [] as string[],
+    message: '',
+    region: '',
+    departement: ''
   });
 
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log('Form submitted:', formData);
-    setSubmitted(true);
+    setLoading(true);
+    setError('');
+    
+    try {
+      // Send the quote request to the server
+      const response = await axios.post('/quote-requests', formData);
+      
+      if (response.data.success) {
+        setSubmitted(true);
+        setFormData({
+          nom: '',
+          email: '',
+          telephone: '',
+          entreprise: '',
+          metier: '',
+          besoins: [],
+          message: '',
+          region: '',
+          departement: ''
+        });
+      } else {
+        setError(response.data.message || 'Une erreur est survenue lors de l\'envoi de votre demande.');
+      }
+    } catch (err: any) {
+      console.error('Error submitting quote request:', err);
+      setError(err.response?.data?.message || 'Une erreur est survenue lors de l\'envoi de votre demande.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -84,6 +115,38 @@ const DemanderDevis = () => {
     "Portail client"
   ];
 
+  const regions = [
+    "Auvergne-Rhône-Alpes",
+    "Bourgogne-Franche-Comté",
+    "Bretagne",
+    "Centre-Val de Loire",
+    "Corse",
+    "Grand Est",
+    "Hauts-de-France",
+    "Île-de-France",
+    "Normandie",
+    "Nouvelle-Aquitaine",
+    "Occitanie",
+    "Pays de la Loire",
+    "Provence-Alpes-Côte d'Azur"
+  ];
+
+  const departements: Record<string, string[]> = {
+    "Auvergne-Rhône-Alpes": ["01", "03", "07", "15", "26", "38", "42", "43", "63", "69", "73", "74"],
+    "Bourgogne-Franche-Comté": ["21", "25", "39", "58", "70", "71", "89", "90"],
+    "Bretagne": ["22", "29", "35", "56"],
+    "Centre-Val de Loire": ["18", "28", "36", "37", "41", "45"],
+    "Corse": ["2A", "2B"],
+    "Grand Est": ["08", "10", "51", "52", "54", "55", "57", "67", "68", "88"],
+    "Hauts-de-France": ["02", "59", "60", "62", "80"],
+    "Île-de-France": ["75", "77", "78", "91", "92", "93", "94", "95"],
+    "Normandie": ["14", "27", "50", "61", "76"],
+    "Nouvelle-Aquitaine": ["16", "17", "19", "23", "24", "33", "40", "47", "64", "79", "86", "87"],
+    "Occitanie": ["09", "11", "12", "30", "31", "32", "34", "46", "48", "65", "66", "81", "82"],
+    "Pays de la Loire": ["44", "49", "53", "72", "85"],
+    "Provence-Alpes-Côte d'Azur": ["04", "05", "06", "13", "83", "84"]
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -131,6 +194,12 @@ const DemanderDevis = () => {
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">
                     Vos informations
                   </h2>
+                  
+                  {error && (
+                    <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                      {error}
+                    </div>
+                  )}
                   
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -219,6 +288,45 @@ const DemanderDevis = () => {
                       </select>
                     </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label htmlFor="region" className="block text-sm font-medium text-gray-700 mb-2">
+                          Région
+                        </label>
+                        <select
+                          id="region"
+                          name="region"
+                          value={formData.region}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
+                        >
+                          <option value="">Sélectionnez votre région</option>
+                          {regions.map((region, index) => (
+                            <option key={index} value={region}>{region}</option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label htmlFor="departement" className="block text-sm font-medium text-gray-700 mb-2">
+                          Département
+                        </label>
+                        <select
+                          id="departement"
+                          name="departement"
+                          value={formData.departement}
+                          onChange={handleChange}
+                          disabled={!formData.region}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200 disabled:bg-gray-100 disabled:text-gray-500"
+                        >
+                          <option value="">Sélectionnez votre département</option>
+                          {formData.region && departements[formData.region]?.map((dept, index) => (
+                            <option key={index} value={dept}>{dept}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Vos besoins
@@ -264,10 +372,20 @@ const DemanderDevis = () => {
 
                     <button
                       type="submit"
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center space-x-2"
+                      disabled={loading}
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-70 disabled:transform-none disabled:hover:shadow-none"
                     >
-                      <Send className="h-5 w-5" />
-                      <span>Demander mon devis gratuit</span>
+                      {loading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white"></div>
+                          <span>Envoi en cours...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="h-5 w-5" />
+                          <span>Demander mon devis gratuit</span>
+                        </>
+                      )}
                     </button>
                   </form>
                 </>

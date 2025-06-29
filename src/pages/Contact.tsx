@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Clock, Send, MessageCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { 
+  Mail, 
+  Phone, 
+  MapPin, 
+  Clock, 
+  Send, 
+  MessageCircle, 
+  ArrowRight
+} from 'lucide-react';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -269,13 +278,13 @@ const Contact = () => {
                 </div>
 
                 <div className="mt-6">
-                  <a 
-                    href="/metiers/faq" 
+                  <Link 
+                    to="/metiers/faq" 
                     className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors duration-200"
                   >
                     <MessageCircle className="h-5 w-5" />
                     <span>Voir toutes les FAQ</span>
-                  </a>
+                  </Link>
                 </div>
               </div>
             </div>

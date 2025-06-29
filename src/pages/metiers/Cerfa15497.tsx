@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { 
   FileText, 
   Calendar, 
-  Users, 
+  FileText as FileIcon, 
   MapPin, 
+  Users, 
   BarChart3,
   CheckCircle,
   ArrowRight,
@@ -90,7 +91,7 @@ const Cerfa15497 = () => {
               
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                 <Link
-                  to="/metiers/demander-devis"
+                  to="/auth/login"
                   className="bg-gradient-to-r from-blue-600 to-green-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 text-center flex items-center justify-center space-x-2"
                 >
                   <span>Essayer gratuitement</span>
@@ -298,7 +299,7 @@ const Cerfa15497 = () => {
           
           <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
             <Link
-              to="/metiers/demander-devis"
+              to="/auth/login"
               className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
             >
               Démarrer mon essai gratuit

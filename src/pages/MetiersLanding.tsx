@@ -231,10 +231,10 @@ const MetiersLanding = () => {
               Nous contacter
             </Link>
             <Link
-              to="/metiers/demander-devis"
+              to="/auth/login"
               className="text-white border-2 border-white hover:bg-white hover:text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300"
             >
-              Demander un devis
+              Essayer gratuitement
             </Link>
           </div>
         </div>

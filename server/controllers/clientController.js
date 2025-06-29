@@ -144,6 +144,8 @@ export const exportClients = async (req, res) => {
       { id: 'email', title: 'Email' },
       { id: 'phone', title: 'Phone' },
       { id: 'address', title: 'Address' },
+      { id: 'subscribed', title: 'Subscribed' },
+      { id: 'subscriptionType', title: 'Subscription Type' },
       { id: 'createdAt', title: 'Created At' }
     ];
     
@@ -153,6 +155,8 @@ export const exportClients = async (req, res) => {
       email: client.email,
       phone: client.phone,
       address: client.address,
+      subscribed: client.subscribed ? 'Yes' : 'No',
+      subscriptionType: client.subscriptionType || 'None',
       createdAt: client.createdAt
     }));
     

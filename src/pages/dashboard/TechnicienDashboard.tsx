@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Calendar, 
@@ -8,16 +8,43 @@ import {
   AlertCircle, 
   FileText, 
   Users,
-  Tool,
   ArrowRight,
   Wrench,
   Clipboard,
   MessageSquare
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import axios from 'axios';
 
 const TechnicienDashboard = () => {
   const { user } = useAuthStore();
+  const [quoteRequests, setQuoteRequests] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchQuoteRequests = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get('/quote-requests');
+        // Filter for new or relevant requests
+        const filteredRequests = response.data.filter(req => 
+          req.status === 'new' || 
+          req.assignedTo === user?.id ||
+          (req.region && req.region === user?.region) ||
+          (req.departement && req.departement === user?.departement)
+        );
+        setQuoteRequests(filteredRequests);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching quote requests:', err);
+        setError('Erreur lors du chargement des demandes de devis');
+        setLoading(false);
+      }
+    };
+
+    fetchQuoteRequests();
+  }, [user]);
 
   const todayInterventions = [
     { 
@@ -139,6 +166,79 @@ const TechnicienDashboard = () => {
 
         {/* Right Column */}
         <div className="space-y-6">
+          {/* Quote Requests */}
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+              <div className="flex items-center">
+                <MessageSquare className="h-5 w-5 text-blue-600 mr-2" />
+                <h2 className="text-lg font-semibold text-gray-900">Demandes de devis</h2>
+              </div>
+              <Link to="/dashboard/quote-requests" className="text-sm text-blue-600 hover:text-blue-700 flex items-center">
+                Voir toutes <ArrowRight className="h-4 w-4 ml-1" />
+              </Link>
+            </div>
+            
+            <div className="p-4">
+              {loading ? (
+                <div className="flex justify-center items-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
+                </div>
+              ) : error ? (
+                <div className="p-4 text-center">
+                  <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
+                  <p className="text-gray-600">{error}</p>
+                </div>
+              ) : quoteRequests.length > 0 ? (
+                <div className="space-y-3">
+                  {quoteRequests.slice(0, 3).map((request) => (
+                    <div key={request._id} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-gray-900">{request.nom}</p>
+                          <p className="text-sm text-gray-600">{request.metier || 'Non spécifié'}</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            {new Date(request.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          request.status === 'new' ? 'bg-blue-100 text-blue-800' :
+                          request.status === 'assigned' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-green-100 text-green-800'
+                        }`}>
+                          {request.status === 'new' ? 'Nouvelle' : 
+                           request.status === 'assigned' ? 'Assignée' : 'Contactée'}
+                        </span>
+                      </div>
+                      <div className="mt-2 flex justify-end">
+                        <Link 
+                          to={`/dashboard/quote-requests/${request._id}`}
+                          className="text-sm text-blue-600 hover:text-blue-800"
+                        >
+                          Voir détails
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                  {quoteRequests.length > 3 && (
+                    <div className="text-center pt-2">
+                      <Link 
+                        to="/dashboard/quote-requests" 
+                        className="text-sm text-blue-600 hover:text-blue-800"
+                      >
+                        Voir {quoteRequests.length - 3} autres demandes
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <MessageSquare className="h-10 w-10 text-gray-400 mx-auto mb-2" />
+                  <p className="text-gray-500">Aucune demande de devis</p>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Quick Actions */}
           <div className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200">

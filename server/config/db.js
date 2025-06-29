@@ -5,11 +5,28 @@ dotenv.config();
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://localhost:27017/batuta');
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    // In development mode without MONGODB_URI, skip database connection
+    if (process.env.NODE_ENV === 'development' && !process.env.MONGODB_URI) {
+      console.log('⚠ No MONGODB_URI found in development mode');
+      console.log('⚠ Running in demo mode without database');
+      return false;
+    }
+
+    if (!process.env.MONGODB_URI) {
+      throw new Error('MONGODB_URI not found in environment variables');
+    }
+    
+    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    console.log(`✓ MongoDB connected: ${conn.connection.host}`);
+    return true;
   } catch (error) {
-    console.error(`Error connecting to MongoDB: ${error.message}`);
-    process.exit(1);
+    console.log('⚠ MongoDB connection failed:', error.message);
+    console.log('⚠ Running in demo mode without database');
+    return false;
   }
 };
 

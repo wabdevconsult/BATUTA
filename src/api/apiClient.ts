@@ -14,16 +14,21 @@ apiClient.interceptors.request.use(
     // Get token from localStorage
     const authStorage = localStorage.getItem('batuta-auth-storage');
     if (authStorage) {
-      const parsedStorage = JSON.parse(authStorage);
-      const token = parsedStorage?.state?.token;
-      
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      try {
+        const parsedStorage = JSON.parse(authStorage);
+        const token = parsedStorage?.state?.token;
+        
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (error) {
+        console.error('Error parsing auth storage:', error);
       }
     }
     return config;
   },
   (error) => {
+    console.error('Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
@@ -34,6 +39,8 @@ apiClient.interceptors.response.use(
     return response;
   },
   async (error) => {
+    console.error('API Error:', error.response?.data || error.message);
+    
     const originalRequest = error.config;
     
     // If 401 Unauthorized or 403 Forbidden and not already retrying

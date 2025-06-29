@@ -1,13 +1,44 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ChevronDown, Zap } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, ChevronDown, Zap, MessageCircle } from 'lucide-react';
+import { useAuthStore } from '../store/authStore';
+import { getUnreadCount } from '../api/messages';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMetiersDropdownOpen, setIsMetiersDropdownOpen] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuthStore();
 
   const isActive = (path: string) => location.pathname === path;
+
+  useEffect(() => {
+    // Only fetch unread messages if user is logged in
+    if (user) {
+      const fetchUnreadCount = async () => {
+        try {
+          const count = await getUnreadCount();
+          setUnreadMessages(count);
+        } catch (error) {
+          console.error('Failed to fetch unread messages count:', error);
+        }
+      };
+
+      fetchUnreadCount();
+      
+      // Set up polling for unread messages (every 60 seconds)
+      const interval = setInterval(fetchUnreadCount, 60000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/auth/login');
+  };
 
   const metiersCategories = [
     {
@@ -147,18 +178,44 @@ const Header = () => {
 
           {/* CTA Button */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link 
-              to="/login" 
-              className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
-            >
-              Se connecter
-            </Link>
-            <Link 
-              to="/metiers/demander-devis" 
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
-            >
-              Demander un devis
-            </Link>
+            {user ? (
+              <div className="flex items-center space-x-4">
+                {/* Messages icon with notification badge */}
+                <Link 
+                  to="/dashboard/messages" 
+                  className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 relative"
+                >
+                  <MessageCircle className="h-6 w-6" />
+                  {unreadMessages > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                      {unreadMessages > 9 ? '9+' : unreadMessages}
+                    </span>
+                  )}
+                </Link>
+                
+                <Link 
+                  to="/dashboard" 
+                  className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
+                >
+                  Tableau de bord
+                </Link>
+                <button 
+                  onClick={handleLogout}
+                  className="text-gray-700 hover:text-red-600 font-medium transition-colors duration-200"
+                >
+                  Déconnexion
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link 
+                  to="/metiers/demander-devis" 
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+                >
+                  Essayer gratuitement
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -210,20 +267,53 @@ const Header = () => {
                 Personnaliser
               </Link>
               <div className="pt-4 border-t border-gray-100 space-y-2">
-                <Link 
-                  to="/login" 
-                  className="block text-gray-700 hover:text-blue-600 font-medium"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Se connecter
-                </Link>
-                <Link 
-                  to="/metiers/demander-devis" 
-                  className="block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg font-medium text-center"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Demander un devis
-                </Link>
+                {user ? (
+                  <>
+                    {/* Messages link with notification badge */}
+                    <Link 
+                      to="/dashboard/messages" 
+                      className="block text-gray-700 hover:text-blue-600 font-medium relative"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      <div className="flex items-center">
+                        <MessageCircle className="h-5 w-5 mr-2" />
+                        <span>Messages</span>
+                        {unreadMessages > 0 && (
+                          <span className="ml-2 bg-blue-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                            {unreadMessages > 9 ? '9+' : unreadMessages}
+                          </span>
+                        )}
+                      </div>
+                    </Link>
+                    
+                    <Link 
+                      to="/dashboard" 
+                      className="block text-gray-700 hover:text-blue-600 font-medium"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Tableau de bord
+                    </Link>
+                    <button 
+                      onClick={() => {
+                        handleLogout();
+                        setIsMenuOpen(false);
+                      }}
+                      className="block w-full text-left text-gray-700 hover:text-red-600 font-medium"
+                    >
+                      Déconnexion
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link 
+                      to="/metiers/demander-devis" 
+                      className="block bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg font-medium text-center"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Essayer gratuitement
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>

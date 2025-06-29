@@ -1,41 +1,34 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Calendar, 
-  FileText, 
-  CreditCard, 
-  ArrowRight, 
-  Clock, 
-  CheckCircle, 
-  AlertCircle,
-  MessageSquare,
-  Download,
-  ExternalLink,
-  Calculator
-} from 'lucide-react';
+import { Calendar, Clock, MapPin, CheckCircle, AlertCircle, FileText, Users, PenTool as Tool, ArrowRight, Wrench, Clipboard, MessageSquare, Download, ExternalLink, Calculator, CreditCard } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import axios from 'axios';
 
 const ClientDashboard = () => {
   const { user } = useAuthStore();
+  const [interventions, setInterventions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const upcomingInterventions = [
-    { 
-      id: 1, 
-      date: '18/05/2025', 
-      time: '09:00 - 12:00', 
-      type: 'Maintenance', 
-      technician: 'Jean Dupont',
-      status: 'confirmed' 
-    },
-    { 
-      id: 2, 
-      date: '25/05/2025', 
-      time: '14:00 - 16:00', 
-      type: 'Installation', 
-      technician: 'Pierre Martin',
-      status: 'pending' 
-    }
-  ];
+  useEffect(() => {
+    const fetchInterventions = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get('/interventions/schedule/upcoming');
+        // Ensure interventions is always an array
+        const interventionsData = Array.isArray(response.data) ? response.data : [];
+        setInterventions(interventionsData);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching interventions:', err);
+        setError('Erreur lors du chargement des interventions');
+        setInterventions([]); // Set to empty array on error
+        setLoading(false);
+      }
+    };
+
+    fetchInterventions();
+  }, []);
 
   const recentDocuments = [
     { id: 1, name: 'Facture #F2024-156', type: 'facture', date: '10/05/2025', amount: '450,00 €', status: 'paid' },
@@ -78,10 +71,20 @@ const ClientDashboard = () => {
               </Link>
             </div>
             
-            {upcomingInterventions.length > 0 ? (
+            {loading ? (
+              <div className="p-6 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 mx-auto"></div>
+                <p className="mt-2 text-gray-600">Chargement des interventions...</p>
+              </div>
+            ) : error ? (
+              <div className="p-6 text-center">
+                <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-2" />
+                <p className="text-gray-600">{error}</p>
+              </div>
+            ) : interventions.length > 0 ? (
               <div className="divide-y divide-gray-200">
-                {upcomingInterventions.map((intervention) => (
-                  <div key={intervention.id} className="p-4 hover:bg-gray-50">
+                {interventions.map((intervention) => (
+                  <div key={intervention._id} className="p-4 hover:bg-gray-50">
                     <div className="flex items-start">
                       <div className="flex-shrink-0 mr-4">
                         <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
@@ -91,25 +94,41 @@ const ClientDashboard = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
                           <p className="text-sm font-medium text-gray-900 truncate">
-                            {intervention.type}
+                            {intervention.title}
                           </p>
                           <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            intervention.status === 'confirmed' ? 'bg-green-100 text-green-800' :
-                            'bg-yellow-100 text-yellow-800'
+                            intervention.status === 'scheduled' ? 'bg-blue-100 text-blue-800' :
+                            intervention.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
+                            intervention.status === 'completed' ? 'bg-green-100 text-green-800' :
+                            'bg-red-100 text-red-800'
                           }`}>
-                            {intervention.status === 'confirmed' ? 'Confirmé' : 'En attente'}
+                            {intervention.status === 'scheduled' ? 'Planifiée' :
+                             intervention.status === 'in_progress' ? 'En cours' :
+                             intervention.status === 'completed' ? 'Terminée' : 'Annulée'}
                           </span>
                         </div>
                         <div className="mt-1 flex items-center text-sm text-gray-500">
-                          <span className="truncate">{intervention.date} • {intervention.time}</span>
+                          <span className="truncate">
+                            {new Date(intervention.scheduledDate).toLocaleDateString('fr-FR', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
                         </div>
                         <div className="mt-1 flex items-center text-sm text-gray-500">
-                          <span className="truncate">Technicien: {intervention.technician}</span>
+                          <MapPin className="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" />
+                          <span className="truncate">{intervention.location?.address}</span>
+                        </div>
+                        <div className="mt-1 flex items-center text-sm text-gray-500">
+                          <span className="truncate">Technicien: {intervention.technicianId?.firstName} {intervention.technicianId?.lastName}</span>
                         </div>
                       </div>
                       <div className="ml-4">
                         <Link
-                          to={`/dashboard/interventions/${intervention.id}`}
+                          to={`/dashboard/interventions/${intervention._id}`}
                           className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-5 font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                         >
                           Détails

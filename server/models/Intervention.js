@@ -1,43 +1,80 @@
-import db from '../config/db.js';
+import mongoose from 'mongoose';
 
-class Intervention {
-  static create(interventionData) {
-    const { clientId, userId, title, description, status = 'scheduled', scheduledDate } = interventionData;
-    const stmt = db.prepare(`
-      INSERT INTO interventions (clientId, userId, title, description, status, scheduledDate)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `);
-    const result = stmt.run(clientId, userId, title, description, status, scheduledDate);
-    return { id: result.lastInsertRowid, ...interventionData };
+const interventionSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: [true, 'Title is required'],
+    trim: true
+  },
+  description: {
+    type: String,
+    trim: true
+  },
+  clientId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Client',
+    required: true
+  },
+  technicianId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  scheduledDate: {
+    type: Date,
+    required: true
+  },
+  endDate: {
+    type: Date
+  },
+  status: {
+    type: String,
+    enum: ['scheduled', 'in_progress', 'completed', 'cancelled'],
+    default: 'scheduled'
+  },
+  location: {
+    address: {
+      type: String,
+      required: true
+    },
+    coordinates: {
+      lat: Number,
+      lng: Number
+    }
+  },
+  technicianLocation: {
+    lat: Number,
+    lng: Number,
+    lastUpdated: Date
+  },
+  priority: {
+    type: String,
+    enum: ['low', 'medium', 'high', 'urgent'],
+    default: 'medium'
+  },
+  notes: {
+    type: String
+  },
+  attachments: [{
+    name: String,
+    url: String,
+    type: String,
+    uploadedAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   }
+}, {
+  timestamps: true
+});
 
-  static findById(id) {
-    const stmt = db.prepare('SELECT * FROM interventions WHERE id = ?');
-    return stmt.get(id);
-  }
+// Index for geospatial queries
+interventionSchema.index({ 'location.coordinates': '2dsphere' });
 
-  static findByUserId(userId) {
-    const stmt = db.prepare('SELECT * FROM interventions WHERE userId = ?');
-    return stmt.all(userId);
-  }
-
-  static findAll() {
-    const stmt = db.prepare('SELECT * FROM interventions');
-    return stmt.all();
-  }
-
-  static update(id, interventionData) {
-    const fields = Object.keys(interventionData).map(key => `${key} = ?`).join(', ');
-    const values = Object.values(interventionData);
-    const stmt = db.prepare(`UPDATE interventions SET ${fields}, updatedAt = CURRENT_TIMESTAMP WHERE id = ?`);
-    stmt.run(...values, id);
-    return this.findById(id);
-  }
-
-  static delete(id) {
-    const stmt = db.prepare('DELETE FROM interventions WHERE id = ?');
-    return stmt.run(id);
-  }
-}
+const Intervention = mongoose.model('Intervention', interventionSchema);
 
 export default Intervention;

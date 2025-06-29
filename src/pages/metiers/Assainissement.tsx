@@ -11,7 +11,6 @@ import {
   ArrowRight,
   Clock,
   Shield,
-  Wrench,
   Filter,
   Waves,
   AlertTriangle
@@ -91,7 +90,7 @@ const Assainissement = () => {
               
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                 <Link
-                  to="/metiers/demander-devis"
+                  to="/auth/login"
                   className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 text-center flex items-center justify-center space-x-2"
                 >
                   <span>Essayer gratuitement</span>
@@ -221,9 +220,9 @@ const Assainissement = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div className="bg-blue-50 rounded-xl p-8">
-              <Waves className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-              <div className="text-3xl font-bold text-gray-900 mb-2">500km</div>
-              <p className="text-gray-600">de réseaux gérés par nos clients</p>
+              <Clock className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+              <div className="text-3xl font-bold text-gray-900 mb-2">24h</div>
+              <p className="text-gray-600">délai moyen d'intervention d'urgence</p>
             </div>
             <div className="bg-green-50 rounded-xl p-8">
               <Shield className="h-12 w-12 text-green-600 mx-auto mb-4" />
@@ -231,9 +230,9 @@ const Assainissement = () => {
               <p className="text-gray-600">conformité réglementaire assurée</p>
             </div>
             <div className="bg-cyan-50 rounded-xl p-8">
-              <Clock className="h-12 w-12 text-cyan-600 mx-auto mb-4" />
-              <div className="text-3xl font-bold text-gray-900 mb-2">24h</div>
-              <p className="text-gray-600">délai moyen d'intervention d'urgence</p>
+              <Waves className="h-12 w-12 text-cyan-600 mx-auto mb-4" />
+              <div className="text-3xl font-bold text-gray-900 mb-2">500km</div>
+              <p className="text-gray-600">de réseaux gérés par nos clients</p>
             </div>
           </div>
         </div>
@@ -251,7 +250,7 @@ const Assainissement = () => {
           
           <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
             <Link
-              to="/metiers/demander-devis"
+              to="/auth/login"
               className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
             >
               Démarrer mon essai gratuit

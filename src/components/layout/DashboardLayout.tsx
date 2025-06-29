@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Menu, 
   X, 
   Bell, 
   ChevronDown,
-  Search
+  Search,
+  MessageCircle
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import DashboardSidebar from './DashboardSidebar';
+import { getUnreadCount } from '../../api/messages';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -17,8 +19,29 @@ interface DashboardLayoutProps {
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const { user, logout } = useAuthStore();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Fetch unread messages count
+    const fetchUnreadCount = async () => {
+      try {
+        const count = await getUnreadCount();
+        setUnreadMessages(count);
+      } catch (error) {
+        console.error('Failed to fetch unread messages count:', error);
+      }
+    };
+
+    fetchUnreadCount();
+
+    // Set up polling for unread messages (every 60 seconds)
+    const interval = setInterval(fetchUnreadCount, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -72,10 +95,27 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
               
               {/* Right side */}
               <div className="flex items-center space-x-4">
+                {/* Messages */}
+                <button 
+                  className="p-1 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 relative"
+                  onClick={() => navigate('/dashboard/messages')}
+                >
+                  <MessageCircle className="h-6 w-6" />
+                  {unreadMessages > 0 && (
+                    <span className="absolute top-0 right-0 block h-4 w-4 rounded-full bg-blue-500 ring-2 ring-white text-white text-xs flex items-center justify-center">
+                      {unreadMessages > 9 ? '9+' : unreadMessages}
+                    </span>
+                  )}
+                </button>
+                
                 {/* Notifications */}
                 <button className="p-1 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 relative">
                   <Bell className="h-6 w-6" />
-                  <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                  {unreadNotifications > 0 && (
+                    <span className="absolute top-0 right-0 block h-4 w-4 rounded-full bg-red-500 ring-2 ring-white text-white text-xs flex items-center justify-center">
+                      {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                    </span>
+                  )}
                 </button>
                 
                 {/* User menu */}

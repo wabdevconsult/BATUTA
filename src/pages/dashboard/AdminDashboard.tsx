@@ -14,30 +14,43 @@ import {
   FileText,
   ArrowRight,
   Globe,
-  Eye
+  Eye,
+  MessageSquare
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import { getAllPersonalizations } from '../../api/personalization';
 import { Personalization } from '../../types/personalization';
+import axios from 'axios';
 
 const AdminDashboard = () => {
   const { user } = useAuthStore();
   const [personalizations, setPersonalizations] = useState<Personalization[]>([]);
+  const [quoteRequests, setQuoteRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchPersonalizations = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getAllPersonalizations();
-        setPersonalizations(data);
+        setLoading(true);
+        
+        // Fetch personalizations
+        const personalizationsData = await getAllPersonalizations();
+        setPersonalizations(personalizationsData);
+        
+        // Fetch quote requests
+        const quoteRequestsResponse = await axios.get('/quote-requests');
+        setQuoteRequests(quoteRequestsResponse.data);
+        
+        setLoading(false);
       } catch (error) {
-        console.error('Error fetching personalizations:', error);
-      } finally {
+        console.error('Error fetching dashboard data:', error);
+        setError('Erreur lors du chargement des données');
         setLoading(false);
       }
     };
 
-    fetchPersonalizations();
+    fetchData();
   }, []);
 
   const stats = [
@@ -98,11 +111,14 @@ const AdminDashboard = () => {
 
       {/* Main content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Personalizations */}
+        {/* Quote Requests */}
         <div className="lg:col-span-2 bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-            <h2 className="text-lg font-semibold text-gray-900">Personnalisations récentes</h2>
-            <Link to="/dashboard/personalizations" className="text-sm text-blue-600 hover:text-blue-700 flex items-center">
+            <div className="flex items-center">
+              <MessageSquare className="h-5 w-5 text-blue-600 mr-2" />
+              <h2 className="text-lg font-semibold text-gray-900">Demandes de devis récentes</h2>
+            </div>
+            <Link to="/dashboard/quote-requests" className="text-sm text-blue-600 hover:text-blue-700 flex items-center">
               Voir toutes <ArrowRight className="h-4 w-4 ml-1" />
             </Link>
           </div>
@@ -110,9 +126,14 @@ const AdminDashboard = () => {
             {loading ? (
               <div className="p-6 text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-2 text-gray-600">Chargement des personnalisations...</p>
+                <p className="mt-2 text-gray-600">Chargement des demandes...</p>
               </div>
-            ) : personalizations.length > 0 ? (
+            ) : error ? (
+              <div className="p-6 text-center">
+                <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-2" />
+                <p className="text-gray-600">{error}</p>
+              </div>
+            ) : quoteRequests.length > 0 ? (
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
@@ -120,10 +141,13 @@ const AdminDashboard = () => {
                       Client
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Nom du site
+                      Métier
                     </th>
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Date
+                    </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Statut
                     </th>
                     <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
@@ -131,30 +155,36 @@ const AdminDashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {personalizations.slice(0, 5).map((personalization) => (
-                    <tr key={personalization._id} className="hover:bg-gray-50">
+                  {quoteRequests.slice(0, 5).map((request) => (
+                    <tr key={request._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
-                          {personalization.userId?.firstName} {personalization.userId?.lastName}
+                          {request.nom}
                         </div>
-                        <div className="text-sm text-gray-500">{personalization.userId?.email}</div>
+                        <div className="text-sm text-gray-500">{request.email}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{personalization.siteName}</div>
+                        <div className="text-sm text-gray-900">{request.metier || 'Non spécifié'}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(personalization.updatedAt || '').toLocaleDateString()}
+                        {new Date(request.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          request.status === 'new' ? 'bg-blue-100 text-blue-800' :
+                          request.status === 'assigned' ? 'bg-yellow-100 text-yellow-800' :
+                          request.status === 'contacted' ? 'bg-purple-100 text-purple-800' :
+                          request.status === 'completed' ? 'bg-green-100 text-green-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {request.status === 'new' ? 'Nouvelle' :
+                           request.status === 'assigned' ? 'Assignée' :
+                           request.status === 'contacted' ? 'Contactée' :
+                           request.status === 'completed' ? 'Complétée' : 'Rejetée'}
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a 
-                          href={`/preview/${personalization._id}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-900 mr-3"
-                        >
-                          <Eye className="h-5 w-5 inline" />
-                        </a>
-                        <Link to={`/dashboard/personalizations/${personalization._id}`} className="text-indigo-600 hover:text-indigo-900">
+                        <Link to={`/dashboard/quote-requests/${request._id}`} className="text-blue-600 hover:text-blue-900">
                           Détails
                         </Link>
                       </td>
@@ -164,8 +194,8 @@ const AdminDashboard = () => {
               </table>
             ) : (
               <div className="p-6 text-center">
-                <Globe className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                <p className="text-gray-500">Aucune personnalisation trouvée</p>
+                <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+                <p className="text-gray-500">Aucune demande de devis trouvée</p>
               </div>
             )}
           </div>
@@ -217,6 +247,79 @@ const AdminDashboard = () => {
               ))}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Recent Personalizations */}
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+          <h2 className="text-lg font-semibold text-gray-900">Personnalisations récentes</h2>
+          <Link to="/dashboard/personalizations" className="text-sm text-blue-600 hover:text-blue-700 flex items-center">
+            Voir toutes <ArrowRight className="h-4 w-4 ml-1" />
+          </Link>
+        </div>
+        <div className="overflow-x-auto">
+          {loading ? (
+            <div className="p-6 text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-2 text-gray-600">Chargement des personnalisations...</p>
+            </div>
+          ) : personalizations.length > 0 ? (
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Client
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Nom du site
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {personalizations.slice(0, 5).map((personalization) => (
+                  <tr key={personalization._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {personalization.userId?.firstName} {personalization.userId?.lastName}
+                      </div>
+                      <div className="text-sm text-gray-500">{personalization.userId?.email}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{personalization.siteName}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {new Date(personalization.updatedAt || '').toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <a 
+                        href={`/preview/${personalization._id}`} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-900 mr-3"
+                      >
+                        <Eye className="h-5 w-5 inline" />
+                      </a>
+                      <Link to={`/dashboard/personalizations/${personalization._id}`} className="text-indigo-600 hover:text-indigo-900">
+                        Détails
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="p-6 text-center">
+              <Globe className="h-12 w-12 text-gray-400 mx-auto mb-2" />
+              <p className="text-gray-500">Aucune personnalisation trouvée</p>
+            </div>
+          )}
         </div>
       </div>
 

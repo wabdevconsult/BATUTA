@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Configure email transporter
-const transporter = nodemailer.createTransport({
+const transporter = nodemailer.createTransporter({
   host: process.env.SMTP_HOST || 'smtp.example.com',
   port: process.env.SMTP_PORT || 587,
   secure: process.env.SMTP_SECURE === 'true',
@@ -16,11 +16,67 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// Mock data for demo mode
+const mockPersonalizations = [
+  {
+    _id: '507f1f77bcf86cd799439011',
+    userId: {
+      _id: '507f1f77bcf86cd799439012',
+      email: 'client1@example.com',
+      firstName: 'Jean',
+      lastName: 'Dupont'
+    },
+    siteName: 'Électricité Dupont',
+    primaryColor: '#3B82F6',
+    secondaryColor: '#1E40AF',
+    logo: 'https://images.pexels.com/photos/1036936/pexels-photo-1036936.jpeg?auto=compress&cs=tinysrgb&w=200',
+    heroImage: 'https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?auto=compress&cs=tinysrgb&w=800',
+    description: 'Services électriques professionnels depuis 15 ans',
+    services: ['Installation électrique', 'Dépannage', 'Mise aux normes'],
+    contactInfo: {
+      phone: '01 23 45 67 89',
+      email: 'contact@electricite-dupont.fr',
+      address: '123 Rue de la République, 75001 Paris'
+    },
+    createdAt: new Date('2024-01-15'),
+    updatedAt: new Date('2024-01-20')
+  },
+  {
+    _id: '507f1f77bcf86cd799439013',
+    userId: {
+      _id: '507f1f77bcf86cd799439014',
+      email: 'client2@example.com',
+      firstName: 'Marie',
+      lastName: 'Martin'
+    },
+    siteName: 'Plomberie Martin',
+    primaryColor: '#059669',
+    secondaryColor: '#047857',
+    logo: 'https://images.pexels.com/photos/1036936/pexels-photo-1036936.jpeg?auto=compress&cs=tinysrgb&w=200',
+    heroImage: 'https://images.pexels.com/photos/1216589/pexels-photo-1216589.jpeg?auto=compress&cs=tinysrgb&w=800',
+    description: 'Plomberie et chauffage, intervention rapide 24h/24',
+    services: ['Plomberie générale', 'Chauffage', 'Dépannage urgence'],
+    contactInfo: {
+      phone: '01 98 76 54 32',
+      email: 'contact@plomberie-martin.fr',
+      address: '456 Avenue des Champs, 69000 Lyon'
+    },
+    createdAt: new Date('2024-01-10'),
+    updatedAt: new Date('2024-01-25')
+  }
+];
+
 // @desc    Get personalization for current user
 // @route   GET /api/personalization/my
 // @access  Private
 export const getMyPersonalization = async (req, res) => {
   try {
+    if (process.env.NODE_ENV === 'development') {
+      // Return mock data for development mode
+      const mockPersonalization = mockPersonalizations.find(p => p.userId._id === req.user.id) || mockPersonalizations[0];
+      return res.json(mockPersonalization);
+    }
+
     const personalization = await Personalization.findOne({ userId: req.user.id });
     
     if (!personalization) {
@@ -39,6 +95,18 @@ export const getMyPersonalization = async (req, res) => {
 // @access  Private
 export const updateMyPersonalization = async (req, res) => {
   try {
+    if (process.env.NODE_ENV === 'development') {
+      // Return mock updated data for development mode
+      const mockPersonalization = {
+        _id: '507f1f77bcf86cd799439011',
+        userId: req.user.id,
+        ...req.body,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      return res.json(mockPersonalization);
+    }
+
     let personalization = await Personalization.findOne({ userId: req.user.id });
     
     if (personalization) {
@@ -89,6 +157,11 @@ export const updateMyPersonalization = async (req, res) => {
 // @access  Private/Admin
 export const getAllPersonalizations = async (req, res) => {
   try {
+    if (process.env.NODE_ENV === 'development') {
+      // Return mock data for development mode
+      return res.json(mockPersonalizations);
+    }
+
     const personalizations = await Personalization.find().populate('userId', 'email firstName lastName');
     res.json(personalizations);
   } catch (error) {
@@ -102,6 +175,12 @@ export const getAllPersonalizations = async (req, res) => {
 // @access  Private/Admin
 export const getPersonalizationById = async (req, res) => {
   try {
+    if (process.env.NODE_ENV === 'development') {
+      // Return mock data for development mode
+      const mockPersonalization = mockPersonalizations.find(p => p._id === req.params.id) || mockPersonalizations[0];
+      return res.json(mockPersonalization);
+    }
+
     const personalization = await Personalization.findById(req.params.id).populate('userId', 'email firstName lastName');
     
     if (!personalization) {
@@ -120,6 +199,11 @@ export const getPersonalizationById = async (req, res) => {
 // @access  Private/Admin
 export const deletePersonalization = async (req, res) => {
   try {
+    if (process.env.NODE_ENV === 'development') {
+      // Return success message for development mode
+      return res.json({ message: 'Personalization deleted successfully' });
+    }
+
     const personalization = await Personalization.findById(req.params.id);
     
     if (!personalization) {

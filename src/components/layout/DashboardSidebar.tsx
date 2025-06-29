@@ -1,20 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  Home, 
-  Users, 
-  FileText, 
-  Settings, 
-  CreditCard, 
-  Calendar, 
-  BarChart3, 
-  Package, 
-  Truck,
-  LogOut,
-  User,
-  Sliders,
-  Brush
-} from 'lucide-react';
+import { Home, Users, FileText, Settings, CreditCard, Calendar, BarChart3, Package, Truck, LogOut, User, Sliders, Brush, MessageCircle, MapPin, PenTool as Tool, Wrench } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
 interface SidebarProps {
@@ -32,11 +18,16 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ onClose }) => {
       { name: 'Profil', path: '/dashboard/profile', icon: User },
       { name: 'Paramètres', path: '/dashboard/settings', icon: Settings },
       { name: 'Personnalisation', path: '/dashboard/personalization', icon: Brush },
+      { name: 'Messagerie', path: '/dashboard/messages', icon: MessageCircle },
     ];
 
     const adminItems = [
       ...commonItems,
       { name: 'Utilisateurs', path: '/dashboard/users', icon: Users },
+      { name: 'Demandes de devis', path: '/dashboard/quote-requests', icon: MessageCircle },
+      { name: 'Interventions', path: '/dashboard/interventions', icon: MapPin },
+      { name: 'Équipements', path: '/dashboard/equipments', icon: Tool },
+      { name: 'Installations', path: '/dashboard/installations', icon: Wrench },
       { name: 'Devis', path: '/dashboard/devis', icon: FileText },
       { name: 'Factures', path: '/dashboard/factures', icon: FileText },
       { name: 'Paiements', path: '/dashboard/paiements', icon: CreditCard },
@@ -45,6 +36,10 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ onClose }) => {
     const technicienItems = [
       ...commonItems,
       { name: 'Disponibilités', path: '/dashboard/disponibilites', icon: Calendar },
+      { name: 'Demandes de devis', path: '/dashboard/quote-requests', icon: MessageCircle },
+      { name: 'Interventions', path: '/dashboard/interventions', icon: MapPin },
+      { name: 'Équipements', path: '/dashboard/equipments', icon: Tool },
+      { name: 'Installations', path: '/dashboard/installations', icon: Wrench },
       { name: 'Devis', path: '/dashboard/devis', icon: FileText },
       { name: 'Factures', path: '/dashboard/factures', icon: FileText },
       { name: 'Paiements', path: '/dashboard/paiements', icon: CreditCard },
@@ -52,6 +47,8 @@ const DashboardSidebar: React.FC<SidebarProps> = ({ onClose }) => {
 
     const clientItems = [
       ...commonItems,
+      { name: 'Interventions', path: '/dashboard/interventions', icon: MapPin },
+      { name: 'Équipements', path: '/dashboard/equipments', icon: Tool },
       { name: 'Devis', path: '/dashboard/devis', icon: FileText },
       { name: 'Factures', path: '/dashboard/factures', icon: FileText },
       { name: 'Paiements', path: '/dashboard/paiements', icon: CreditCard },

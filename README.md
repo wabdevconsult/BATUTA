@@ -5,19 +5,51 @@ BATUTA is a comprehensive CRM SaaS application designed for service professional
 ## Features
 
 - User management with role-based access control
-- Client management
+- Client management with subscription tracking
 - Product catalog
 - Quote and invoice generation
 - Personalization options
 - Data export capabilities
 - Mobile-responsive design
+- Equipment and installation tracking
+- Intervention management
+- Messaging system
 
 ## Tech Stack
 
 - **Frontend**: React, TypeScript, Tailwind CSS, Lucide Icons
 - **Backend**: Node.js, Express
-- **Database**: SQLite (via better-sqlite3)
+- **Database**: MongoDB
 - **Authentication**: JWT
+
+## Project Structure
+
+```
+/
+├── src/                  # Frontend React application
+│   ├── api/              # API client and service functions
+│   ├── components/       # React components
+│   ├── hooks/            # Custom React hooks
+│   ├── pages/            # Page components
+│   ├── services/         # Service layer for API calls
+│   ├── store/            # State management (Zustand)
+│   ├── types/            # TypeScript type definitions
+│   └── App.tsx           # Main application component
+│
+├── server/               # Backend Node.js application
+│   ├── config/           # Server configuration
+│   ├── controllers/      # Route controllers
+│   ├── middleware/       # Express middleware
+│   ├── models/           # Mongoose models
+│   ├── routes/           # Express routes
+│   └── utils/            # Utility functions
+│
+├── public/               # Static assets
+├── .env                  # Environment variables (not in repo)
+├── .env.example          # Example environment variables
+├── server.js             # Main server entry point
+└── package.json          # Project dependencies and scripts
+```
 
 ## Getting Started
 
@@ -25,6 +57,7 @@ BATUTA is a comprehensive CRM SaaS application designed for service professional
 
 - Node.js (v16 or higher)
 - npm or yarn
+- MongoDB (optional for development)
 
 ### Installation
 
@@ -38,10 +71,18 @@ BATUTA is a comprehensive CRM SaaS application designed for service professional
    ```
    npm run dev
    ```
-5. Start the backend server:
-   ```
-   npm run server
-   ```
+
+### Development Modes
+
+- **Full Stack**: `npm run dev` - Starts both frontend and backend
+- **Frontend Only**: `npm run dev:frontend` - Starts only the Vite dev server
+- **Backend Only**: `npm run server` - Starts only the Express server
+
+### Demo Mode
+
+The application can run in demo mode without a database connection. In this mode, all data is temporary and stored in memory.
+
+To run in demo mode, set `NODE_ENV=development` in your `.env` file and don't provide a `MONGODB_URI`.
 
 ### Demo Accounts
 

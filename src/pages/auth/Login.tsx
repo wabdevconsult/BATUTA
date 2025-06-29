@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, Zap, AlertCircle } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Zap, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
 const Login = () => {
@@ -10,6 +10,7 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState('');
+  const [loginAttempted, setLoginAttempted] = useState(false);
   
   const { login, user, error, loading } = useAuthStore();
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const Login = () => {
   useEffect(() => {
     // If user is already logged in, redirect
     if (user) {
+      console.log('User already logged in, redirecting to', from);
       navigate(from, { replace: true });
     }
   }, [user, navigate, from]);
@@ -28,6 +30,7 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
+    setLoginAttempted(true);
     
     if (!formData.email || !formData.password) {
       setFormError('Veuillez remplir tous les champs');
@@ -35,10 +38,12 @@ const Login = () => {
     }
     
     try {
+      console.log('Login submitted:', formData);
       await login(formData);
       // The redirect will happen in the useEffect when user state updates
-    } catch (err) {
-      console.error('Login error:', err);
+    } catch (err: any) {
+      console.error('Login error in component:', err);
+      setFormError(err.message || 'Échec de la connexion. Veuillez réessayer.');
     }
   };
 
@@ -61,7 +66,11 @@ const Login = () => {
     setFormData(account);
     // Submit the form after setting the data
     setTimeout(() => {
-      login(account);
+      console.log('Logging in with demo account:', account);
+      login(account).catch(err => {
+        console.error('Demo login error:', err);
+        setFormError(err.message || 'Échec de la connexion avec le compte de démonstration.');
+      });
     }, 100);
   };
 
@@ -92,6 +101,12 @@ const Login = () => {
             <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start">
               <AlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
               <span>{formError || error}</span>
+            </div>
+          )}
+          
+          {loginAttempted && !error && !formError && loading && (
+            <div className="mb-6 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded-lg">
+              Tentative de connexion en cours...
             </div>
           )}
           
@@ -165,7 +180,7 @@ const Login = () => {
               </div>
 
               <div className="text-sm">
-                <Link to="/forgot-password" className="text-blue-600 hover:text-blue-700 transition-colors duration-200">
+                <Link to="/auth/forgot-password" className="text-blue-600 hover:text-blue-700 transition-colors duration-200">
                   Mot de passe oublié ?
                 </Link>
               </div>
@@ -224,12 +239,23 @@ const Login = () => {
             <p className="text-gray-600">
               Pas encore de compte ?{' '}
               <Link 
-                to="/register" 
+                to="/auth/register" 
                 className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
               >
                 Créer un compte gratuitement
               </Link>
             </p>
+          </div>
+          
+          {/* Return to home */}
+          <div className="mt-6 text-center">
+            <Link 
+              to="/" 
+              className="inline-flex items-center text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
+            >
+              <ArrowLeft className="h-4 w-4 mr-1" />
+              Retour à l'accueil
+            </Link>
           </div>
         </div>
 

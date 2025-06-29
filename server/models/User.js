@@ -36,6 +36,22 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: String,
     trim: true
+  },
+  region: {
+    type: String,
+    trim: true
+  },
+  departement: {
+    type: String,
+    trim: true
+  },
+  specialties: {
+    type: [String],
+    default: []
+  },
+  active: {
+    type: Boolean,
+    default: true
   }
 }, {
   timestamps: true

@@ -25,7 +25,9 @@ export const savePersonalization = async (data: Partial<Personalization>): Promi
 export const getAllPersonalizations = async (): Promise<Personalization[]> => {
   try {
     const response = await apiClient.get('/personalization');
-    return response.data;
+    // Ensure we always return an array
+    const data = response.data;
+    return Array.isArray(data) ? data : [];
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Failed to get all personalizations');
   }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { usePersonalizationStore } from '../../store/personalizationStore';
+import { usePersonalizationStore, defaultPersonalization } from '../../store/personalizationStore';
 import { useAuthStore } from '../../store/authStore';
 import { 
   Brush, 
@@ -20,7 +20,7 @@ import formules from '../../data/formules.json';
 const UserPersonalization = () => {
   const { personalization, fetchPersonalization, updatePersonalization, loading, error } = usePersonalizationStore();
   const { user } = useAuthStore();
-  const [editData, setEditData] = useState(null);
+  const [editData, setEditData] = useState(personalization || defaultPersonalization);
   const [activeTab, setActiveTab] = useState('general');
   const [previewMode, setPreviewMode] = useState(false);
   const [success, setSuccess] = useState('');
@@ -122,17 +122,6 @@ const UserPersonalization = () => {
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg max-w-md">
           <h2 className="text-lg font-semibold mb-2">Erreur</h2>
           <p>{error}</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!editData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg max-w-md">
-          <h2 className="text-lg font-semibold mb-2">Aucune personnalisation</h2>
-          <p>Vous n'avez pas encore personnalisé votre site. Commencez maintenant !</p>
         </div>
       </div>
     );
