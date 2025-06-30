@@ -477,19 +477,41 @@ const PageAccueilPersonnalisee = () => {
               )}
             </div>
 
-            {/* Edit Button */}
+           {/* Edit Buttons */}
             <div>
               <h3 className="text-lg font-semibold mb-4">Personnalisation</h3>
-              <button 
-                onClick={() => setIsEditing(true)}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
-                style={{ 
-                  background: `linear-gradient(to right, ${editData.theme.primaryColor}, ${editData.theme.secondaryColor})`,
-                  borderRadius: editData.theme.borderRadius 
-                }}
-              >
-                Modifier mon site
-              </button>
+             <div className="space-y-2">
+                <Link
+                  to="/dashboard/personalization?tab=content"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 block text-center"
+                  style={{
+                    background: `linear-gradient(to right, ${editData.theme.primaryColor}, ${editData.theme.secondaryColor})`,
+                    borderRadius: editData.theme.borderRadius
+                  }}
+                >
+                  Modifier services & fonctionnalités
+                </Link>
+                <Link
+                  to="/dashboard/personalization?tab=theme"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 block text-center"
+                  style={{
+                    background: `linear-gradient(to right, ${editData.theme.primaryColor}, ${editData.theme.secondaryColor})`,
+                    borderRadius: editData.theme.borderRadius
+                  }}
+                >
+                  Modifier charte graphique & logo
+                </Link>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 w-full"
+                  style={{
+                    background: `linear-gradient(to right, ${editData.theme.primaryColor}, ${editData.theme.secondaryColor})`,
+                    borderRadius: editData.theme.borderRadius
+                  }}
+                >
+                  Modifier mon site
+                </button>
+              </div>
             </div>
           </div>
 

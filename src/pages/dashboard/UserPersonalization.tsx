@@ -1,8 +1,6 @@
 import { ChangeEvent, useState, useEffect } from 'react';
 import { usePersonalizationStore, defaultPersonalization } from '../../store/personalizationStore';
 import { useAuthStore } from '../../store/authStore';
-import { useSearchParams } from 'react-router-dom';
-import type { Personalization } from '../../types/personalization';
 import { 
   Brush, 
   Save, 
@@ -23,16 +21,16 @@ const UserPersonalization = () => {
   const { personalization, fetchPersonalization, updatePersonalization, loading, error } = usePersonalizationStore();
   const { user } = useAuthStore();
   const [editData, setEditData] = useState(personalization || defaultPersonalization);
-  const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('general');
   const [previewMode, setPreviewMode] = useState(false);
   const [success, setSuccess] = useState('');
   const [selectedSimulateur, setSelectedSimulateur] = useState<any>(null);
+   const [searchParams] = useSearchParams();
 
-   useEffect(() => {
-    const tab = searchParams.get('tab');
-    if (tab) {
-      setActiveTab(tab);
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam) {
+      setActiveTab(tabParam);
     }
   }, [searchParams]);
 
@@ -54,16 +52,8 @@ const UserPersonalization = () => {
     }
   }, [personalization]);
 
-      const handleChange = (
-     e: React.ChangeEvent<
-       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-     >,
-     section: keyof Personalization | null = null,
-     index: number | null = null,
-     field: string | null = null
-   ) => {
-    const { name, value } = e.target;
-
+   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>, section: keyof Personalization | null = null, index: number | null = null, field: string | null = null) => {
+    
     if (section && index !== null && field) {
       // Handle nested array objects (services, activities, etc.)
       setEditData(prev => {
