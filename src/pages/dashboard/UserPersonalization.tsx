@@ -28,7 +28,6 @@ const UserPersonalization = () => {
   const [previewMode, setPreviewMode] = useState(false);
   const [success, setSuccess] = useState('');
   const [selectedSimulateur, setSelectedSimulateur] = useState<any>(null);
-   const [searchParams] = useSearchParams();
 
    useEffect(() => {
     const tab = searchParams.get('tab');
