@@ -45,5 +45,23 @@
       {"label": "Prix kWh (€)", "type": "number", "defaultValue": 0.15}
     ],
     "formule": "let coef = 1.5; if (Coefficient === 'Mauvaise (2)') coef = 2; else if (Coefficient === 'Moyenne (1.5)') coef = 1.5; else if (Coefficient === 'Bonne (1)') coef = 1; else coef = 0.7; (Surface * coef * 100 * Prix).toFixed(2) + ' €/an'"
+   },
+  {
+    "id": "devis-site-web",
+    "nom": "Estimation de prix pour site web",
+    "champs": [
+      {"label": "Nombre de pages", "type": "slider", "min": 1, "max": 20, "step": 1, "defaultValue": 5},
+      {"label": "Prix par page (€)", "type": "number", "defaultValue": 500}
+    ],
+    "formule": "(Nombre * Prix).toFixed(2) + ' €'"
+  },
+  {
+    "id": "devis-charte-graphique",
+    "nom": "Estimation de charte graphique",
+    "champs": [
+      {"label": "Nombre de propositions", "type": "slider", "min": 1, "max": 5, "step": 1, "defaultValue": 2},
+      {"label": "Prix par proposition (€)", "type": "number", "defaultValue": 800}
+    ],
+    "formule": "(Nombre * Prix).toFixed(2) + ' €'"
   }
 ]

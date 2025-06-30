@@ -139,6 +139,26 @@ export const usePersonalizationStore = create<PersonalizationState>((set) => ({
   fetchPersonalization: async () => {
     try {
       set({ loading: true, error: null });
+
+      // If the user is not authenticated, skip the API call and
+      // use the default personalization template. This prevents the
+      // API client from redirecting to the login page on 401 errors.
+      const authStorage = localStorage.getItem('batuta-auth-storage');
+      let token: string | null = null;
+      if (authStorage) {
+        try {
+          const parsed = JSON.parse(authStorage);
+          token = parsed?.state?.token || null;
+        } catch (err) {
+          console.error('Error parsing auth storage:', err);
+        }
+      }
+
+      if (!token) {
+        set({ personalization: defaultPersonalization, loading: false });
+        return;
+      }
+
       const data = await getMyPersonalization();
       // Merge fetched data with default personalization to ensure all properties exist
       const mergedData = { ...defaultPersonalization, ...data };
