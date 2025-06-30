@@ -1,16 +1,11 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Package, 
   FileText, 
   Truck, 
   ArrowRight, 
-  Clock, 
-  CheckCircle, 
-  AlertCircle,
   Upload,
   Download,
-  BarChart3,
   ShoppingCart
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';

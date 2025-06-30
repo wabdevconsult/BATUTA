@@ -4,6 +4,7 @@ import {
   Mail, 
   Phone, 
   MapPin, 
+  FileText,
   MessageCircle, 
   Send, 
   Users, 

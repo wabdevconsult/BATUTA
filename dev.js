@@ -22,7 +22,7 @@ const serverProcess = spawn('node', ['server.js'], {
 });
 
 // Start the frontend development server
-const clientProcess = spawn('npm', ['run', 'dev'], {
+const clientProcess = spawn('npm', ['run', 'dev:frontend'], {
   stdio: 'inherit',
   shell: true,
 });

@@ -15,10 +15,25 @@ import {
   Settings 
 } from 'lucide-react';
 import axios from 'axios';
+interface Equipment {
+  _id?: string;
+  name?: string;
+  brand?: string;
+  model?: string;
+  serialNumber?: string;
+  clientId?: { name?: string };
+  location?: { address?: string };
+  installationDate?: string;
+  technicianId?: { firstName?: string; lastName?: string; _id?: string };
+  lastMaintenanceDate?: string;
+  nextMaintenanceDate?: string;
+  status?: string;
+  type?: string;
+}
 import { useAuthStore } from '../../store/authStore';
 
 const EquipmentsPage = () => {
-  const [equipments, setEquipments] = useState([]);
+   const [equipments, setEquipments] = useState<Equipment[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -46,7 +61,7 @@ const EquipmentsPage = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+ const handleDelete = async (id: string) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cet équipement ?')) {
       return;
     }
@@ -81,7 +96,7 @@ const EquipmentsPage = () => {
     return matchesSearch && matchesStatus && matchesType;
   });
 
-  const getStatusBadgeClass = (status) => {
+   const getStatusBadgeClass = (status: string) => {
     switch (status) {
       case 'operational':
         return 'bg-green-100 text-green-800';
@@ -115,7 +130,7 @@ const EquipmentsPage = () => {
     }
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     if (!dateString) return 'Non définie';
     const date = new Date(dateString);
     return date.toLocaleDateString('fr-FR');

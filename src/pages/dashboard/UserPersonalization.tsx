@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { ChangeEvent, useState, useEffect } from 'react';
 import { usePersonalizationStore, defaultPersonalization } from '../../store/personalizationStore';
 import { useAuthStore } from '../../store/authStore';
 import { 
@@ -24,7 +24,7 @@ const UserPersonalization = () => {
   const [activeTab, setActiveTab] = useState('general');
   const [previewMode, setPreviewMode] = useState(false);
   const [success, setSuccess] = useState('');
-  const [selectedSimulateur, setSelectedSimulateur] = useState(null);
+  const [selectedSimulateur, setSelectedSimulateur] = useState<any>(null);
 
   useEffect(() => {
     fetchPersonalization();
@@ -44,8 +44,7 @@ const UserPersonalization = () => {
     }
   }, [personalization]);
 
-  const handleChange = (e, section = null, index = null, field = null) => {
-    const { name, value } = e.target;
+   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>, section: keyof Personalization | null = null, index: number | null = null, field: string | null = null) => {
     
     if (section && index !== null && field) {
       // Handle nested array objects (services, activities, etc.)
@@ -58,7 +57,7 @@ const UserPersonalization = () => {
       // Handle nested objects (theme, contact, etc.)
       setEditData(prev => {
         const newData = { ...prev };
-        newData[section][field] = value;
+         (newData as any)[section as keyof Personalization][field as string] = value;
         return newData;
       });
     } else {
@@ -70,7 +69,7 @@ const UserPersonalization = () => {
     }
   };
 
-  const handleSimulateurChange = (e) => {
+  const handleSimulateurChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const simulateurId = e.target.value;
     
     setEditData(prev => ({
@@ -85,7 +84,7 @@ const UserPersonalization = () => {
     setSelectedSimulateur(simulator);
   };
 
-  const handleToggleSimulateur = (e) => {
+  const handleToggleSimulateur = (e: ChangeEvent<HTMLInputElement>) => {
     const { checked } = e.target;
     
     setEditData(prev => ({

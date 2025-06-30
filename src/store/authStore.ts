@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { loginUser, registerUser, logoutUser, getCurrentUser } from '../api/auth';
-import { AuthState, LoginCredentials, RegisterData, User } from '../types/auth';
+import { AuthState, LoginCredentials, RegisterData } from '../types/auth';
 
 export const useAuthStore = create<AuthState & {
   login: (credentials: LoginCredentials) => Promise<void>;

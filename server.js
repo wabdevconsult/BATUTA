@@ -10,10 +10,13 @@ import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import hpp from 'hpp';
 import cookieParser from 'cookie-parser';
+import jwt from 'jsonwebtoken';
 import connectDB from './server/config/db.js';
 
 // Load environment variables
 dotenv.config();
+
+const JWT_SECRET = process.env.JWT_SECRET || 'batuta-jwt-secret-key';
 
 // Get current directory
 const __filename = fileURLToPath(import.meta.url);
@@ -101,29 +104,31 @@ const setupFallbackRoutes = () => {
   
   // Auth fallback
   app.post('/auth/login', (req, res) => {
-    res.json({
-      token: 'demo-token-12345',
-      user: {
-        id: '507f1f77bcf86cd799439012',
-        email: req.body.email || 'demo@batuta.fr',
-        firstName: 'Demo',
-        lastName: 'User',
-        role: 'admin'
-      }
-    });
+   const user = {
+      id: '507f1f77bcf86cd799439012',
+      email: req.body.email || 'demo@batuta.fr',
+      firstName: 'Demo',
+      lastName: 'User',
+      role: 'admin'
+    };
+
+    const token = jwt.sign(user, JWT_SECRET, { expiresIn: '7d' });
+
+    res.json({ token, user });
   });
 
   app.post('/auth/register', (req, res) => {
-    res.json({
-      token: 'demo-token-12345',
-      user: {
-        id: '507f1f77bcf86cd799439013',
-        email: req.body.email,
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        role: 'client'
-      }
-    });
+     const user = {
+      id: '507f1f77bcf86cd799439013',
+      email: req.body.email,
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      role: 'client'
+    };
+
+    const token = jwt.sign(user, JWT_SECRET, { expiresIn: '7d' });
+
+    res.json({ token, user });
   });
 
   // Personalization fallback

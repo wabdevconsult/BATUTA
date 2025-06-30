@@ -99,12 +99,15 @@ const Home = () => {
                 <span>Essayer gratuitement</span>
                 <ArrowRight className="h-5 w-5" />
               </Link>
-              <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors duration-200">
+              <Link
+                to="/auth/login"
+                className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors duration-200"
+              >
                 <div className="bg-white rounded-full p-3 shadow-lg">
                   <Play className="h-6 w-6 text-blue-600" />
                 </div>
                 <span className="font-medium">Voir la démo</span>
-              </button>
+              </Link>
             </div>
 
             {/* Stats */}
