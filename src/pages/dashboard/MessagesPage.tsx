@@ -48,7 +48,7 @@ const MessagesPage = () => {
 
   useEffect(() => {
     // Refresh messages when the component mounts
-    fetchMessages();
+   // fetchMessages();
   }, [fetchMessages]);
 
   // Filter messages based on search term

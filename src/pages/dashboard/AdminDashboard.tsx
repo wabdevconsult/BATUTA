@@ -20,7 +20,7 @@ import {
 import { useAuthStore } from '../../store/authStore';
 import { getAllPersonalizations } from '../../api/personalization';
 import { Personalization } from '../../types/personalization';
-import axios from 'axios';
+import apiClient from '../../api/apiClient';
 
 const AdminDashboard = () => {
   const { user } = useAuthStore();
@@ -35,13 +35,13 @@ const AdminDashboard = () => {
         setLoading(true);
         
         // Fetch personalizations
-        const personalizationsData = await getAllPersonalizations();
+        /*const personalizationsData = await getAllPersonalizations();
         setPersonalizations(personalizationsData);
-        
+        */
         // Fetch quote requests
-        const quoteRequestsResponse = await axios.get('/quote-requests');
+       /* const quoteRequestsResponse = await apiClient.get('/quote-requests');
         setQuoteRequests(quoteRequestsResponse.data);
-        
+        */
         setLoading(false);
       } catch (error) {
         console.error('Error fetching dashboard data:', error);

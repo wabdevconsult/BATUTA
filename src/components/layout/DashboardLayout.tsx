@@ -28,8 +28,8 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
     // Fetch unread messages count
     const fetchUnreadCount = async () => {
       try {
-        const count = await getUnreadCount();
-        setUnreadMessages(count);
+       /* const count = await getUnreadCount();
+        setUnreadMessages(count);*/
       } catch (error) {
         console.error('Failed to fetch unread messages count:', error);
       }

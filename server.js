@@ -30,16 +30,29 @@ console.log('Starting BATUTA CRM Server...');
 console.log(`Environment: ${process.env.NODE_ENV || 'production'}`);
 console.log(`Target Port: ${PORT}`);
 
+// Rate limiter configuration based on environment
+const isDevelopment = process.env.NODE_ENV === 'development';
+const rateLimitMax = isDevelopment ? 1000 : 100;
+if (isDevelopment) {
+  console.log(
+    `Development mode detected - rate limit set to ${rateLimitMax} requests per 15 minutes`
+  );
+} else {
+  console.log('Rate limiting enabled (100 requests per 15 minutes)');
+}
+
 // Rate limiter
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: process.env.NODE_ENV === 'development' ? 1000 : 100,
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 // Middleware
-app.use(limiter);
+if (process.env.NODE_ENV !== 'test') {
+  app.use(limiter);
+}
 app.use(cors({
   origin: ['http://localhost:5173', 'http://localhost:3000'],
   credentials: true

@@ -14,7 +14,7 @@ import {
   User,
   MessageSquare
 } from 'lucide-react';
-import axios from 'axios';
+import apiClient from '../../api/apiClient';
 import { useAuthStore } from '../../store/authStore';
 
 const QuoteRequestsPage = () => {
@@ -35,8 +35,8 @@ const QuoteRequestsPage = () => {
   const fetchQuoteRequests = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('/quote-requests');
-      setQuoteRequests(response.data);
+     const response = await apiClient.get('/quote-requests');
+      setQuoteRequests(Array.isArray(response.data) ? response.data : []);
       setLoading(false);
     } catch (err) {
       console.error('Error fetching quote requests:', err);
@@ -47,7 +47,7 @@ const QuoteRequestsPage = () => {
 
   const handleStatusChange = async (id, newStatus) => {
     try {
-      await axios.put(`/quote-requests/${id}`, { status: newStatus });
+      await apiClient.put(`/quote-requests/${id}`, { status: newStatus });
       setQuoteRequests(quoteRequests.map(request => 
         request._id === id ? { ...request, status: newStatus } : request
       ));
@@ -62,7 +62,7 @@ const QuoteRequestsPage = () => {
 
   const handleAssign = async (id) => {
     try {
-      const response = await axios.put(`/quote-requests/${id}`, { 
+        const response = await apiClient.put(`/quote-requests/${id}`, {
         assignedTo: user.id,
         status: 'assigned'
       });
@@ -86,7 +86,7 @@ const QuoteRequestsPage = () => {
     }
     
     try {
-      await axios.delete(`/quote-requests/${id}`);
+      await apiClient.delete(`/quote-requests/${id}`);
       setQuoteRequests(quoteRequests.filter(request => request._id !== id));
       setSuccess(`Demande supprimée avec succès`);
       setTimeout(() => setSuccess(''), 3000);
@@ -101,7 +101,7 @@ const QuoteRequestsPage = () => {
     if (!selectedRequest) return;
     
     try {
-      const response = await axios.put(`/quote-requests/${selectedRequest._id}`, { notes });
+      const response = await apiClient.put(`/quote-requests/${selectedRequest._id}`, { notes });
       setQuoteRequests(quoteRequests.map(request => 
         request._id === selectedRequest._id ? { ...request, notes } : request
       ));
