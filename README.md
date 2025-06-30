@@ -93,6 +93,12 @@ The application comes with pre-configured demo accounts:
 - **Client**: client@batuta.fr / client123
 - **Supplier**: fournisseur@batuta.fr / fournisseur123
 
+When using these demo accounts, the frontend still performs a real
+`/auth/login` request. The backend (even in demo mode) responds with a
+signed JWT token which is required for authenticated API routes such as
+`/messages/unread` or `/personalization`.
+
+
 ## Deployment
 
 The application is ready for deployment to platforms like Netlify, Vercel, or Heroku.

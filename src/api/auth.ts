@@ -2,52 +2,10 @@ import apiClient from './apiClient';
 import { LoginCredentials, RegisterData, User } from '../types/auth';
 
 // Login user with email and password
-export const loginUser = async (credentials: LoginCredentials): Promise<{ user: User; token: string }> => {
+export const loginUser = async (
+  credentials: LoginCredentials
+): Promise<{ user: User; token: string }> => {
   console.log('Login API call with:', credentials);
-  
-  // For demo accounts, use mock data
-  if (
-    (credentials.email === 'admin@batuta.fr' && credentials.password === 'admin123') ||
-    (credentials.email === 'tech@batuta.fr' && credentials.password === 'tech123') ||
-    (credentials.email === 'client@batuta.fr' && credentials.password === 'client123') ||
-    (credentials.email === 'fournisseur@batuta.fr' && credentials.password === 'fournisseur123')
-  ) {
-    console.log('Using demo account');
-    
-    // Create mock user based on email
-    let role: 'admin' | 'technicien' | 'client' | 'fournisseur';
-    let firstName: string;
-    
-    if (credentials.email === 'admin@batuta.fr') {
-      role = 'admin';
-      firstName = 'Admin';
-    } else if (credentials.email === 'tech@batuta.fr') {
-      role = 'technicien';
-      firstName = 'Technicien';
-    } else if (credentials.email === 'client@batuta.fr') {
-      role = 'client';
-      firstName = 'Client';
-    } else {
-      role = 'fournisseur';
-      firstName = 'Fournisseur';
-    }
-    
-    const mockUser: User = {
-      id: '123456789',
-      email: credentials.email,
-      role: role,
-      firstName: firstName,
-      lastName: 'BATUTA',
-      company: 'BATUTA SAS',
-      phone: '01 23 45 67 89',
-      createdAt: new Date().toISOString()
-    };
-    
-    // Mock token
-    const token = 'mock-jwt-token-' + role;
-    
-    return { user: mockUser, token };
-  }
   
   // For real accounts, try to call the API
   try {
