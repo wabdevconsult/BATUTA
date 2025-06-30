@@ -1,6 +1,8 @@
 import { ChangeEvent, useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { usePersonalizationStore, defaultPersonalization } from '../../store/personalizationStore';
 import { useAuthStore } from '../../store/authStore';
+import { Personalization } from '../../types/personalization';
 import { 
   Brush, 
   Save, 
@@ -52,23 +54,29 @@ const UserPersonalization = () => {
     }
   }, [personalization]);
 
-   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>, section: keyof Personalization | null = null, index: number | null = null, field: string | null = null) => {
-    
+    const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+    section: keyof Personalization | null = null,
+    index: number | null = null,
+    field: string | null = null
+  ) => {
+    const { name, value } = e.target as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
     if (section && index !== null && field) {
       // Handle nested array objects (services, activities, etc.)
       setEditData(prev => {
-        const newData = { ...prev };
-        newData[section][index][field] = value;
+        const newData = { ...prev } as any;
+        (newData[section] as any)[index][field] = value;
         return newData;
       });
     } else if (section && field) {
+       const newData = { ...prev } as any;
+        (newData[section] as any)[field] = value;
       // Handle nested objects (theme, contact, etc.)
       setEditData(prev => {
-        const newData = { ...prev };
-         (newData as any)[section as keyof Personalization][field as string] = value;
+
         return newData;
       });
-    } else {
+    } else if (name) {
       // Handle top-level fields
       setEditData(prev => ({
         ...prev,

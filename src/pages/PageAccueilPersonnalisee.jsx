@@ -121,24 +121,6 @@ const PageAccueilPersonnalisee = () => {
             <p className="text-xl mb-8 max-w-3xl mx-auto leading-relaxed" style={{ color: editData.theme.textColor }}>
               Votre site personnalisé avec BATUTA. Modifiez ce contenu selon vos besoins.
             </p>
-            
-            <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-12">
-              <Link
-                to="/contact"
-                className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center space-x-2"
-                style={{ borderRadius: editData.theme.borderRadius }}
-              >
-                <span>Nous contacter</span>
-                <ArrowRight className="h-5 w-5" />
-              </Link>
-              <Link
-                to="/services"
-                className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300"
-                style={{ borderRadius: editData.theme.borderRadius }}
-              >
-                Nos services
-              </Link>
-            </div>
           </div>
         </div>
       </section>
