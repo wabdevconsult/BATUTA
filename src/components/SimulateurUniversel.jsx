@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Calculator, Download, Save, Share2, Eye, Settings } from 'lucide-react';
 import { jsPDF } from 'jspdf';
-import * as XLSX from 'xlsx';
 
 const SimulateurUniversel = ({ 
   config, 
@@ -166,30 +165,31 @@ const SimulateurUniversel = ({
     
     doc.save(`simulation_${title.toLowerCase().replace(/\s+/g, '_')}.pdf`);
   };
-
-  // Exporter les résultats en Excel
-  const exportExcel = () => {
-    const wb = XLSX.utils.book_new();
-    
-    // Créer les données
-    const data = [
+  const exportCSV = () => {
+    const rows = [
       ["Simulateur", title],
       ["Date", new Date().toLocaleDateString()],
       [""],
-      ["Paramètres"]
+       ["Paramètres"],
     ];
+
     
     // Ajouter les paramètres
     Object.entries(values).forEach(([key, value]) => {
-      data.push([key, value]);
+      rows.push([key, value]);
     });
     
     // Ajouter le résultat
     data.push([""], ["Résultat", result]);
-    
-    const ws = XLSX.utils.aoa_to_sheet(data);
-    XLSX.utils.book_append_sheet(wb, ws, "Simulation");
-    XLSX.writeFile(wb, `simulation_${title.toLowerCase().replace(/\s+/g, '_')}.xlsx`);
+
+    const csvContent = rows.map(r => r.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `simulation_${title.toLowerCase().replace(/\s+/g, '_')}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   // Sauvegarder la configuration
@@ -476,7 +476,7 @@ const SimulateurUniversel = ({
           </button>
           
           <button
-            onClick={exportExcel}
+            onClick={exportCSV}
             className="px-3 py-1.5 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-sm flex items-center space-x-1"
           >
             <Download className="h-4 w-4" />
